@@ -1,4 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import computed_field
+from functools import lru_cache
 
 class Settings(BaseSettings):
     POSTGRES_USER: str
@@ -9,6 +11,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    @computed_field
     @property
     def DATABASE_URL(self) -> str:
         return (
@@ -19,5 +22,8 @@ class Settings(BaseSettings):
             f"{self.POSTGRES_PORT}/"
             f"{self.POSTGRES_DB}"
     )
+    @lru_cache
+    def get_settings() -> Settings: 
+        return Settings() 
 
-settings = Settings()
+settings = get_settings() 
