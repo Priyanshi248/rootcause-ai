@@ -1,28 +1,29 @@
-from enum import Enum
+
 from pydantic import BaseModel
 
-class SeverityLevel(str, Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
-
-class Environment(str, Enum):
-    DEVELOPMENT = "development"
-    TESTING = "testing"
-    STAGING = "staging"
-    PRODUCTION = "production"
-
-class Status(str, Enum):
-    OPEN = "open"
-    ACKNOWLEDGED = "acknowledged"
-    INVESTIGATING = "investigating"
-    RESOLVED = "resolved"
-    CLOSED = "closed"
+from app.enums.incident import (
+    SeverityLevel,
+    Environment,
+    Status,
+)
 
 class IncidentCreate(BaseModel):
     title: str
     description: str
-    serviceName: str
+    service_name: str
     environment: Environment
     severity: SeverityLevel
+
+from uuid import UUID
+from datetime import datetime
+
+class IncidentResponse(BaseModel):
+    id: UUID
+    title: str
+    description: str
+    service_name: str
+    environment: Environment
+    severity: SeverityLevel
+    status: Status
+    created_at: datetime
+    updated_at: datetime
