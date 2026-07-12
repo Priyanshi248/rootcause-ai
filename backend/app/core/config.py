@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int
 
+    GEMINI_API_KEY: str
+    GEMINI_MODEL: str = "gemini-2.5-flash-lite"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",

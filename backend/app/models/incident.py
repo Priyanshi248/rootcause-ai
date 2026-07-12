@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import String, Text, Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.enums.incident import (
@@ -56,4 +56,18 @@ class Incident(TimestampMixin, Base):
     assigned_engineer: Mapped[str | None] = mapped_column(
         String(100),
         nullable=True,
+    )
+
+    logs: Mapped[list["Log"]] = relationship(
+        "Log",
+        back_populates="incident",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
+    analyses: Mapped[list["Analysis"]] = relationship(
+        "Analysis",
+        back_populates="incident",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )

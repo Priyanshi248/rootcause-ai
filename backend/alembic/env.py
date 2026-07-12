@@ -1,7 +1,7 @@
 from logging.config import fileConfig
 
-
-
+from app.models.log import Log
+from app.models.analysis import Analysis
 from alembic import context
 
 from app.core.config import settings
