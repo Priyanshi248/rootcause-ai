@@ -1,83 +1,112 @@
 # RootCause AI
 
-An AI-powered Incident Response Platform that helps engineering teams analyze production incidents, identify possible root causes using Retrieval-Augmented Generation (RAG), summarize logs, and accelerate incident resolution.
+An AI-powered Incident Response Platform that helps engineering teams investigate production incidents by uploading logs and generating AI-assisted root cause analysis.
+
+The platform enables engineers to create incidents, upload application logs, and receive intelligent summaries, probable root causes, suggested fixes, and follow-up actions using Google's Gemini AI.
 
 ---
 
-## Overview
+# Project Status
 
-RootCause AI is designed to reduce the time engineers spend investigating production issues.
+**Currently Under Active Development**
 
-The platform allows users to create incidents, upload logs, retrieve relevant historical incidents and documentation, and generate AI-assisted root cause analysis using Large Language Models (LLMs).
+Current Version: **v1.0**
 
-Instead of manually reading thousands of log lines, engineers receive concise summaries, possible causes, and recommended next steps.
-
----
-
-## Features
-
+Completed:
 - Incident Management
-  - Create incidents
-  - Track incident status
-  - Assign severity
-  - Environment support (Production, Staging, Development)
+- Log Upload
+- AI Root Cause Analysis
+- PostgreSQL Integration
+- REST APIs
 
-- AI Investigation
-  - AI-generated incident summary
-  - Root cause prediction
-  - Suggested troubleshooting steps
-
-- Retrieval-Augmented Generation (RAG)
-  - Searches previous incidents
-  - Retrieves documentation
-  - Uses relevant context before generating answers
-
-- Log Analysis
-  - Upload logs
-  - AI extracts important errors
-  - Highlights anomalies
-
-- REST API
-  - FastAPI backend
-  - Swagger documentation
+Upcoming:
+- RAG Pipeline
+- AI Chat Assistant
+- Authentication
+- Dashboard
+- Docker Deployment
+- CI/CD
 
 ---
 
-## Tech Stack
+# Features
 
-### Backend
+## Incident Management
+
+- Create incidents
+- View all incidents
+- View incident details
+- Update incidents
+- Delete incidents
+- Track severity
+- Track environment
+- Track incident status
+
+---
+
+## Log Management
+
+- Upload log files
+- Store logs in PostgreSQL
+- Associate logs with incidents
+
+---
+
+## AI Analysis
+
+Using **Google Gemini**, the platform generates:
+
+- Incident Summary
+- Root Cause Analysis
+- Suggested Fixes
+- Follow-up Actions
+
+AI responses are automatically stored for future reference.
+
+---
+
+## REST APIs
+
+Interactive API documentation using Swagger UI.
+
+Available endpoints include:
+
+- Incident APIs
+- Log APIs
+- AI Analysis APIs
+
+---
+
+# Tech Stack
+
+## Backend
 
 - Python
 - FastAPI
-- SQLAlchemy
+- SQLAlchemy (Async)
 - PostgreSQL
+- Alembic
 
-### AI
+## AI
 
-- LangChain
-- OpenAI
-- ChromaDB
-- Sentence Transformers
+- Google Gemini API
+- Prompt Engineering
 
-### DevOps
+## Tools
 
-- Docker
-- Docker Compose
-- GitHub Actions
-- Nginx
-
-### Cloud (Planned)
-
-- AWS
-- Azure
+- Swagger UI
+- Git
+- GitHub
+- Pydantic
 
 ---
 
 # Current API Endpoints
 
+## Incident APIs
+
 | Method | Endpoint | Description |
 |---------|----------|-------------|
-| GET | / | Health Check |
 | POST | /incidents | Create Incident |
 | GET | /incidents | List Incidents |
 | GET | /incidents/{id} | Get Incident |
@@ -86,83 +115,141 @@ Instead of manually reading thousands of log lines, engineers receive concise su
 
 ---
 
+## Log APIs
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| POST | /logs/upload | Upload Logs |
+
+---
+
+## AI APIs
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| POST | /analysis/{incident_id} | Generate AI Root Cause Analysis |
+
+---
+
 # Current Progress
 
-## Phase 1 – Backend Foundation 
+## Phase 1 – Backend Foundation ✅
 
-- [x] Repository setup
-- [x] FastAPI project initialization
-- [x] Virtual environment
-- [x] PostgreSQL connection
-- [x] SQLAlchemy configuration
-- [x] Database models
-- [x] Pydantic schemas
+- [x] FastAPI Setup
+- [x] PostgreSQL Integration
+- [x] SQLAlchemy Async
+- [x] Alembic Migrations
+- [x] Database Models
+- [x] Repository Pattern
+- [x] Service Layer
 - [x] CRUD APIs
-- [x] Swagger documentation
+- [x] Swagger Documentation
 
 ---
 
-## Phase 2 – In Progress 
+## Phase 2 – AI Integration ✅
 
-- [ ] Alembic migrations
-- [ ] Log upload API
-- [ ] File storage
-- [ ] Error handling
-- [ ] API validation
-
----
-
-## Phase 3 – AI Integration
-
-- [ ] Document ingestion
-- [ ] Embedding generation
-- [ ] ChromaDB integration
-- [ ] LangChain pipeline
-- [ ] RAG implementation
-- [ ] AI root cause generation
+- [x] Log Upload
+- [x] Gemini API Integration
+- [x] Prompt Engineering
+- [x] AI Root Cause Analysis
+- [x] Store AI Results
+- [x] Cascade Delete
+- [x] Error Handling
 
 ---
 
-## Phase 4 – Production Ready
+## Phase 3 – In Progress 🚧
 
+- [ ] Dashboard APIs
+- [ ] Incident Timeline
+- [ ] AI Chat
+- [ ] Historical Incident Search
+
+---
+
+## Phase 4 – RAG Pipeline
+
+- [ ] Document Ingestion
+- [ ] Embeddings
+- [ ] Vector Database
+- [ ] Semantic Search
+- [ ] Retrieval-Augmented Generation
+
+---
+
+## Phase 5 – Production Ready
+
+- [ ] JWT Authentication
 - [ ] Docker
 - [ ] Docker Compose
-- [ ] Unit testing
-- [ ] CI/CD pipeline
+- [ ] GitHub Actions
+- [ ] Unit Tests
 - [ ] Deployment
 - [ ] Monitoring
 
 ---
 
-# Roadmap
+# Project Structure
 
-- AI-powered log analysis
-- Semantic search
-- Historical incident retrieval
-- Authentication
-- Dashboard
-- Kubernetes deployment
-- Monitoring with Prometheus
-- Grafana dashboards
-- AWS deployment
+```
+backend/
+│
+├── alembic/
+├── app/
+│   ├── api/
+│   ├── agents/
+│   ├── core/
+│   ├── db/
+│   ├── enums/
+│   ├── mixins/
+│   ├── models/
+│   ├── repositories/
+│   ├── schemas/
+│   ├── services/
+│   └── main.py
+│
+├── uploads/
+├── requirements.txt
+└── README.md
+```
+
+---
+
+# Future Enhancements
+
+- AI Chat Assistant
+- Retrieval-Augmented Generation (RAG)
+- Semantic Search
+- Historical Incident Retrieval
+- Authentication & Authorization
+- Incident Dashboard
+- Docker Deployment
+- CI/CD Pipeline
+- Kubernetes Deployment
+- AWS / Azure Hosting
 
 ---
 
 # Learning Outcomes
 
-This project demonstrates practical experience with:
+This project demonstrates hands-on experience with:
 
-- Backend Development
-- REST APIs
 - FastAPI
+- Python
+- Async SQLAlchemy
 - PostgreSQL
-- SQLAlchemy
-- Docker
-- GitHub Actions
-- Retrieval-Augmented Generation (RAG)
-- Vector Databases
-- LangChain
+- Alembic
+- REST API Design
+- Repository Pattern
+- Service Layer Architecture
 - Prompt Engineering
-- System Design
-- AI-assisted DevOps
+- Google Gemini API
+- Production Incident Management
+- AI-powered Backend Development
 
+---
+
+# Author
+
+**Priyanshi Saxena**
