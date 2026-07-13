@@ -10,8 +10,9 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int
 
-    GEMINI_API_KEY: str
-    GEMINI_MODEL: str = "gemini-2.5-flash-lite"
+    OPENROUTER_API_KEY: str
+    AI_PROVIDER: str = "openrouter"
+    AI_MODEL: str = "nvidia/nemotron-3-super-120b-a12b:free"
 
     model_config = SettingsConfigDict(
         env_file=".env",

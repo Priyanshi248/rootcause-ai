@@ -6,12 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.enums.log import LogSource
 from app.models.log import Log
 from app.repositories.log_repository import LogRepository
+from app.services.timeline_service import TimelineService
 
 
 class LogService:
 
     def __init__(self, db: AsyncSession):
         self.repository = LogRepository(db)
+        self.timeline = TimelineService(db)
 
     async def upload_log(
         self,
@@ -30,4 +32,12 @@ class LogService:
             file_size=len(content),
         )
 
-        return await self.repository.create(log)
+        log = await self.repository.create(log)
+
+        await self.timeline.create_event(
+            incident_id=incident_id,
+            event_type="LOG_UPLOADED",
+            description=f"Log file '{file.filename}' uploaded.",
+        )
+
+        return log

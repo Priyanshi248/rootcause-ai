@@ -23,7 +23,10 @@ class DashboardRepository:
         )
         total = total_result.scalar() or 0
 
+        recent = await self.get_recent_incidents()
+
         return {
+
             "total_incidents": total,
 
             "open_incidents": await count(
@@ -61,4 +64,22 @@ class DashboardRepository:
             "development_incidents": await count(
                 Incident.environment == Environment.DEVELOPMENT
             ),
+
+            "recent_incidents": recent,
         }
+
+    async def get_recent_incidents(self):
+
+        result = await self.db.execute(
+
+            select(Incident)
+
+            .order_by(
+                Incident.created_at.desc()
+            )
+
+            .limit(5)
+
+        )
+
+        return result.scalars().all()

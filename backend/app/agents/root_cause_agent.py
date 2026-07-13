@@ -1,7 +1,8 @@
 import json
-from app.core.config import settings
-from app.agents.gemini_client import client
+
+from app.agents.ai_client import client
 from app.agents.prompts import ROOT_CAUSE_PROMPT
+from app.core.config import settings
 
 
 async def analyze_logs(logs: str):
@@ -10,12 +11,18 @@ async def analyze_logs(logs: str):
         logs=logs
     )
 
-    response = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=prompt,
+    response = client.chat.completions.create(
+        model=settings.AI_MODEL,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        temperature=0.2,
     )
 
-    text = response.text.strip()
+    text = response.choices[0].message.content.strip()
 
     if text.startswith("```json"):
         text = text.replace("```json", "")

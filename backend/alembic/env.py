@@ -1,12 +1,11 @@
 from logging.config import fileConfig
 
-from app.models.log import Log
-from app.models.analysis import Analysis
+import app.models
 from alembic import context
 
 from app.core.config import settings
 from app.db.base import Base
-from app.models.incident import Incident
+
 from sqlalchemy import create_engine
 
 # this is the Alembic Config object, which provides

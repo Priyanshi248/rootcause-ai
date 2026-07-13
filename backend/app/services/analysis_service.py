@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.config import settings
 from app.agents.root_cause_agent import analyze_logs
 
@@ -8,6 +9,8 @@ from app.models.analysis import Analysis
 
 from app.repositories.analysis_repository import AnalysisRepository
 from app.repositories.log_repository import LogRepository
+
+from app.services.timeline_service import TimelineService
 
 
 class AnalysisService:
@@ -18,6 +21,7 @@ class AnalysisService:
     ):
         self.logs = LogRepository(db)
         self.analysis = AnalysisRepository(db)
+        self.timeline = TimelineService(db)
 
     async def analyze(
         self,
@@ -53,9 +57,17 @@ class AnalysisService:
 
             follow_up_actions=ai["follow_up_actions"],
 
-            model_used=settings.GEMINI_MODEL,
+            model_used=settings.AI_MODEL,
         )
 
-        return await self.analysis.create(
+        analysis = await self.analysis.create(
             analysis
         )
+
+        await self.timeline.create_event(
+            incident_id=incident_id,
+            event_type="AI_ANALYSIS_COMPLETED",
+            description="AI generated root cause analysis using Gemini.",
+        )
+
+        return analysis
