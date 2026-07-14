@@ -1,173 +1,304 @@
 # RootCause AI
 
-An AI-powered Incident Response Platform that helps engineering teams investigate production incidents by uploading logs and generating AI-assisted root cause analysis.
+An AI-powered Incident Management Platform that combines Retrieval-Augmented Generation (RAG) with Large Language Models to automate root cause analysis, incident investigation, and remediation suggestions for engineering teams.
 
-The platform enables engineers to create incidents, upload application logs, and receive intelligent summaries, probable root causes, suggested fixes, and follow-up actions using Google's Gemini AI.
+RootCause AI enables developers and DevOps teams to upload production incidents, analyze system logs using AI, retrieve similar historical incidents through vector search, and generate actionable debugging insights—all from a single platform.
 
 ---
 
-# Project Status
+## Features
 
-Current Version: **v1.0**
+- AI-powered root cause analysis using LLMs
+- Retrieval-Augmented Generation (RAG) for historical incident lookup
+- Incident lifecycle management
+- AI-generated summaries and suggested fixes
+- Semantic search over previous incidents
+- JWT Authentication
+- Incident timeline tracking
+- Dockerized backend
+- RESTful API built with FastAPI
+- PostgreSQL database with Alembic migrations
 
-Completed:
-- Incident Management
-- Log Upload
-- AI Root Cause Analysis
-- PostgreSQL Integration
-- REST APIs
-- RAG Pipeline
-- AI Chat Assistant
-- Authentication
-- Dashboard
-- Docker Deployment
-- CI/CD
+---
+
+## Tech Stack
+
+### Backend
+
+- Python
+- FastAPI
+- SQLAlchemy
+- Alembic
+
+### Database
+
+- PostgreSQL
+
+### AI
+
+- OpenRouter API
+- LLMs (Gemini / Nemotron / OpenAI compatible)
+- ChromaDB
+- Retrieval-Augmented Generation (RAG)
+
+### DevOps
+
+- Docker
+- Docker Compose
+
+### Authentication
+
+- JWT
+
+---
+
+# System Architecture
+
+```
+                        User
+                         │
+                         ▼
+                  FastAPI Backend
+                         │
+        ┌────────────────┼────────────────┐
+        ▼                ▼                ▼
+ Authentication    Incident APIs     AI Analysis
+        │                │                │
+        ▼                ▼                ▼
+ PostgreSQL        ChromaDB        OpenRouter LLM
+        │                │                │
+        └───────────────RAG───────────────┘
+                         │
+                         ▼
+               Root Cause Analysis
+```
 
 ---
 
 # Features
 
+## Authentication
+
+- User registration
+- Login
+- JWT authentication
+- Protected APIs
+
+---
+
 ## Incident Management
 
+Users can
+
 - Create incidents
-- View all incidents
-- View incident details
+- View incidents
 - Update incidents
 - Delete incidents
-- Track severity
-- Track environment
-- Track incident status
+- Track incident history
+
+Each incident stores
+
+- Title
+- Description
+- Severity
+- Status
+- Timestamp
 
 ---
 
-## Log Management
+## AI Incident Analysis
 
-- Upload log files
-- Store logs in PostgreSQL
-- Associate logs with incidents
+The AI engine automatically analyzes uploaded incident descriptions and generates
 
----
-
-## AI Analysis
-
-Using **Google Gemini**, the platform generates:
-
-- Incident Summary
-- Root Cause Analysis
-- Suggested Fixes
+- Executive Summary
+- Root Cause
+- Suggested Fix
 - Follow-up Actions
 
-AI responses are automatically stored for future reference.
+Example
+
+```
+Summary:
+Database timeout caused API failures.
+
+Root Cause:
+Missing database index on frequently queried column.
+
+Suggested Fix:
+Create index and optimize slow query.
+
+Follow-up:
+Monitor query latency after deployment.
+```
 
 ---
 
-## REST APIs
+## Retrieval-Augmented Generation (RAG)
 
-Interactive API documentation using Swagger UI.
+Before generating a response, RootCause AI searches previous incidents stored in a vector database.
 
-Available endpoints include:
+The retrieved context is combined with the current incident before sending it to the LLM.
 
-- Incident APIs
-- Log APIs
-- AI Analysis APIs
+Benefits
 
----
-
-# Tech Stack
-
-## Backend
-
-- Python
-- FastAPI
-- SQLAlchemy (Async)
-- PostgreSQL
-- Alembic
-
-## AI
-
-- Google Gemini API
-- Prompt Engineering
-
-## Tools
-
-- Swagger UI
-- Git
-- GitHub
-- Pydantic
+- Better contextual responses
+- Reduced hallucinations
+- Consistent troubleshooting
+- Knowledge reuse
 
 ---
 
-# Current API Endpoints
+## Semantic Search
 
-## Incident APIs
+Historical incidents are embedded into ChromaDB.
 
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| POST | /incidents | Create Incident |
-| GET | /incidents | List Incidents |
-| GET | /incidents/{id} | Get Incident |
-| PUT | /incidents/{id} | Update Incident |
-| DELETE | /incidents/{id} | Delete Incident |
+Similar incidents can be retrieved using semantic similarity instead of keyword matching.
 
 ---
 
-## Log APIs
+## Incident Timeline
 
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| POST | /logs/upload | Upload Logs |
+Every AI analysis is stored separately, allowing teams to
+
+- Track incident evolution
+- Compare analyses
+- Review previous recommendations
 
 ---
 
-## AI APIs
+## Database
 
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| POST | /analysis/{incident_id} | Generate AI Root Cause Analysis |
+Main entities include
+
+### Users
+
+- id
+- username
+- email
+- password
+
+### Incidents
+
+- id
+- title
+- description
+- severity
+- status
+- created_at
+
+### AI Analysis
+
+- id
+- incident_id
+- summary
+- root_cause
+- suggested_fix
+- follow_up_actions
 
 ---
 
 # Project Structure
 
 ```
-backend/
+RootCause-AI/
 │
-├── alembic/
 ├── app/
 │   ├── api/
 │   ├── agents/
-│   ├── core/
-│   ├── db/
-│   ├── enums/
-│   ├── mixins/
 │   ├── models/
 │   ├── repositories/
-│   ├── schemas/
 │   ├── services/
-│   └── main.py
+│   ├── schemas/
+│   ├── db/
+│   └── core/
 │
-├── uploads/
+├── chroma_db/
+├── alembic/
+├── docker-compose.yml
+├── Dockerfile
 ├── requirements.txt
 └── README.md
 ```
 
-# Learning Outcomes
+---
 
-This project demonstrates hands-on experience with:
+# Installation
 
-- FastAPI
-- Python
-- Async SQLAlchemy
-- PostgreSQL
-- Alembic
-- REST API Design
-- Repository Pattern
-- Service Layer Architecture
-- Prompt Engineering
-- Google Gemini API
-- Production Incident Management
-- AI-powered Backend Development
-- Deployment 
+Clone the repository
+
+```bash
+git clone https://github.com/Priyanshi248/rootcause-ai.git
+```
+
+Move into the project
+
+```bash
+cd rootcause-ai
+```
+
+Create environment variables
+
+```env
+DATABASE_URL=
+
+OPENROUTER_API_KEY=
+
+JWT_SECRET_KEY=
+```
+
+Run with Docker
+
+```bash
+docker compose up --build
+```
+
+Run locally
+
+```bash
+pip install -r requirements.txt
+
+uvicorn app.main:app --reload
+```
+
+Swagger UI
+
+```
+http://localhost:8000/docs
+```
+
+---
+
+# Workflow
+
+1. User creates an incident.
+2. Incident is stored in PostgreSQL.
+3. Logs are embedded into ChromaDB.
+4. Similar historical incidents are retrieved.
+5. Context is sent to the LLM.
+6. AI generates:
+
+- Summary
+- Root Cause
+- Suggested Fix
+- Follow-up Actions
+
+7. Analysis is saved.
+8. User can review previous analyses.
+
+---
+
+# Future Enhancements
+
+- Frontend dashboard using React
+- Grafana monitoring
+- Kubernetes deployment
+- CI/CD with GitHub Actions
+- Multi-agent architecture
+- Elasticsearch integration
+- Slack & Microsoft Teams notifications
+- Prometheus metrics
+- Redis caching
+- RBAC (Role-Based Access Control)
 
 ---
 
