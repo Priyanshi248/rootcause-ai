@@ -8,8 +8,6 @@ The platform enables engineers to create incidents, upload application logs, and
 
 # Project Status
 
-**Currently Under Active Development**
-
 Current Version: **v1.0**
 
 Completed:
@@ -18,8 +16,6 @@ Completed:
 - AI Root Cause Analysis
 - PostgreSQL Integration
 - REST APIs
-
-Upcoming:
 - RAG Pipeline
 - AI Chat Assistant
 - Authentication
@@ -131,65 +127,6 @@ Available endpoints include:
 
 ---
 
-# Current Progress
-
-## Phase 1 – Backend Foundation ✅
-
-- [x] FastAPI Setup
-- [x] PostgreSQL Integration
-- [x] SQLAlchemy Async
-- [x] Alembic Migrations
-- [x] Database Models
-- [x] Repository Pattern
-- [x] Service Layer
-- [x] CRUD APIs
-- [x] Swagger Documentation
-
----
-
-## Phase 2 – AI Integration ✅
-
-- [x] Log Upload
-- [x] Gemini API Integration
-- [x] Prompt Engineering
-- [x] AI Root Cause Analysis
-- [x] Store AI Results
-- [x] Cascade Delete
-- [x] Error Handling
-
----
-
-## Phase 3 – In Progress 🚧
-
-- [ ] Dashboard APIs
-- [ ] Incident Timeline
-- [ ] AI Chat
-- [ ] Historical Incident Search
-
----
-
-## Phase 4 – RAG Pipeline
-
-- [ ] Document Ingestion
-- [ ] Embeddings
-- [ ] Vector Database
-- [ ] Semantic Search
-- [ ] Retrieval-Augmented Generation
-
----
-
-## Phase 5 – Production Ready
-
-- [ ] JWT Authentication
-- [ ] Docker
-- [ ] Docker Compose
-- [ ] GitHub Actions
-- [ ] Unit Tests
-- [ ] Deployment
-- [ ] Monitoring
-
----
-
 # Project Structure
 
 ```
@@ -214,23 +151,6 @@ backend/
 └── README.md
 ```
 
----
-
-# Future Enhancements
-
-- AI Chat Assistant
-- Retrieval-Augmented Generation (RAG)
-- Semantic Search
-- Historical Incident Retrieval
-- Authentication & Authorization
-- Incident Dashboard
-- Docker Deployment
-- CI/CD Pipeline
-- Kubernetes Deployment
-- AWS / Azure Hosting
-
----
-
 # Learning Outcomes
 
 This project demonstrates hands-on experience with:
@@ -247,6 +167,7 @@ This project demonstrates hands-on experience with:
 - Google Gemini API
 - Production Incident Management
 - AI-powered Backend Development
+- Deployment 
 
 ---
 
