@@ -5,10 +5,14 @@ from app.agents.prompts import ROOT_CAUSE_PROMPT
 from app.core.config import settings
 
 
-async def analyze_logs(logs: str):
+async def analyze_logs(
+    logs: str,
+    context: str,
+):
 
     prompt = ROOT_CAUSE_PROMPT.format(
-        logs=logs
+        logs=logs,
+        context=context,
     )
 
     response = client.chat.completions.create(

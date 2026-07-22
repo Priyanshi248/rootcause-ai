@@ -3,6 +3,7 @@ import uuid
 from sqlalchemy import String, Text, Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
 
 from app.db.base import Base
 from app.enums.incident import (
@@ -41,6 +42,8 @@ class Incident(TimestampMixin, Base):
         SQLEnum(Environment),
         nullable=False,
     )
+
+   
 
     severity: Mapped[Severity] = mapped_column(
         SQLEnum(Severity),

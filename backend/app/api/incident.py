@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.incident_query import IncidentQuery
 from app.services.incident_service import IncidentService
-
+from app.core.permissions import require_roles
+from app.models.user import User
 from app.schemas.incident_update import IncidentUpdate
 from app.db.session import get_db
 from app.enums.incident import (
@@ -28,6 +29,9 @@ router = APIRouter()
 async def create_incident(
     incident: IncidentCreate,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(
+        require_roles("ADMIN", "ENGINEER", "SRE")
+    ),
 ):
     service = IncidentService(db)
     return await service.create_incident(incident)
@@ -40,6 +44,14 @@ async def create_incident(
 async def get_incident(
     incident_id: UUID,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(
+            "ADMIN",
+            "ENGINEER",
+            "SRE",
+            "VIEWER",
+        )
+    ),
 ):
     service = IncidentService(db)
     return await service.get_incident(incident_id)
@@ -52,6 +64,9 @@ async def update_incident(
     incident_id: UUID,
     data: IncidentUpdate,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(
+        require_roles("ADMIN", "ENGINEER", "SRE")
+    ),
 ):
 
     service = IncidentService(db)
@@ -76,7 +91,16 @@ async def get_all_incidents(
     search: str | None = None,
 
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(
+            "ADMIN",
+            "ENGINEER",
+            "SRE",
+            "VIEWER",
+        )
+    ),
 ):
+
     query = IncidentQuery(
         page=page,
         limit=limit,
@@ -96,6 +120,9 @@ async def get_all_incidents(
 async def delete_incident(
     incident_id: UUID,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(
+        require_roles("ADMIN")
+    ),
 ):
 
     service = IncidentService(db)

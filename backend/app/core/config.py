@@ -13,6 +13,17 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str
     AI_PROVIDER: str = "openrouter"
     AI_MODEL: str = "nvidia/nemotron-3-super-120b-a12b:free"
+    
+    HF_API_TOKEN: str
+    HF_EMBEDDING_MODEL: str
+
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     model_config = SettingsConfigDict(
         env_file=".env",

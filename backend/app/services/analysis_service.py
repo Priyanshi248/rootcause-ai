@@ -12,6 +12,9 @@ from app.repositories.log_repository import LogRepository
 
 from app.services.timeline_service import TimelineService
 
+from app.vectorstore.retrieval_service import RetrievalService
+from app.repositories.incident_repository import IncidentRepository
+
 
 class AnalysisService:
 
@@ -21,6 +24,7 @@ class AnalysisService:
     ):
         self.logs = LogRepository(db)
         self.analysis = AnalysisRepository(db)
+        self.incidents = IncidentRepository(db)
         self.timeline = TimelineService(db)
 
     async def analyze(
@@ -42,8 +46,19 @@ class AnalysisService:
             for log in logs
         )
 
-        ai = await analyze_logs(
+        retrieval = RetrievalService()
+
+        similar_incidents = retrieval.search(
             log_text
+        )
+
+        context = "\n\n".join(
+            similar_incidents
+        )
+
+        ai = await analyze_logs(
+            log_text,
+            context,
         )
 
         analysis = Analysis(
@@ -55,19 +70,43 @@ class AnalysisService:
 
             suggested_fix=ai["suggested_fix"],
 
-            follow_up_actions=ai["follow_up_actions"],
+            follow_up_actions="\n".join(ai["follow_up_actions"])
+            if isinstance(ai["follow_up_actions"], list)
+            else ai["follow_up_actions"],
 
             model_used=settings.AI_MODEL,
         )
 
-        analysis = await self.analysis.create(
+        saved_analysis = await self.analysis.create(
             analysis
+        )
+
+        incident = await self.incidents.get_incident(
+            incident_id
+        )
+
+        retrieval.update_incident_knowledge(
+            incident.id,
+            incident.title,
+            incident.description,
+            incident.service_name,
+            saved_analysis.summary,
+            saved_analysis.root_cause,
+            saved_analysis.suggested_fix,
+            saved_analysis.follow_up_actions,
         )
 
         await self.timeline.create_event(
             incident_id=incident_id,
             event_type="AI_ANALYSIS_COMPLETED",
-            description="AI generated root cause analysis using Gemini.",
+            description="AI generated root cause analysis.",
         )
 
-        return analysis
+        return {
+            "summary": saved_analysis.summary,
+            "root_cause": saved_analysis.root_cause,
+            "suggested_fix": saved_analysis.suggested_fix,
+            "follow_up_actions": saved_analysis.follow_up_actions,
+            "retrieved_incidents": similar_incidents,
+            "retrieved_count": len(similar_incidents),
+}

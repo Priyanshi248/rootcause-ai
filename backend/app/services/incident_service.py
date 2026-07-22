@@ -7,6 +7,7 @@ from app.schemas.incident_query import IncidentQuery
 from app.schemas.incident_update import IncidentUpdate
 from app.enums.incident import Status
 from app.services.timeline_service import TimelineService
+from app.vectorstore.retrieval_service import RetrievalService
 
 
 class IncidentService:
@@ -30,6 +31,15 @@ class IncidentService:
 
         incident = await self.repository.create(
             incident
+        )
+
+        retrieval = RetrievalService()
+
+        retrieval.add_incident(
+            incident.id,
+            incident.title,
+            incident.description,
+            incident.service_name,
         )
 
         timeline = TimelineService(
