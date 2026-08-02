@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.mixins.timestamp import TimestampMixin
@@ -43,4 +43,14 @@ class User(TimestampMixin, Base):
         Boolean,
         default=True,
         nullable=False,
+    )
+
+    incidents: Mapped[list["Incident"]] = relationship(
+        "Incident",
+        back_populates="creator",
+    )
+
+    audit_logs: Mapped[list["AuditLog"]] = relationship(
+        "AuditLog",
+        back_populates="user",
     )

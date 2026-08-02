@@ -61,6 +61,12 @@ class Incident(TimestampMixin, Base):
         nullable=True,
     )
 
+    created_by: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        nullable=False,
+    )
+
     logs: Mapped[list["Log"]] = relationship(
         "Log",
         back_populates="incident",
@@ -73,4 +79,15 @@ class Incident(TimestampMixin, Base):
         back_populates="incident",
         cascade="all, delete-orphan",
         passive_deletes=True,
+    )
+
+    audit_logs: Mapped[list["AuditLog"]] = relationship(
+        "AuditLog",
+        back_populates="incident",
+        cascade="all, delete-orphan",
+    )
+
+    creator: Mapped["User"] = relationship(
+        "User",
+        back_populates="incidents",
     )

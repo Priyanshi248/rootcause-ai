@@ -3,3 +3,4 @@ from app.models.log import Log
 from app.models.analysis import Analysis
 from app.models.timeline import TimelineEvent
 from app.models.user import User
+from app.models.audit_log import AuditLog

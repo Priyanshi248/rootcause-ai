@@ -6,6 +6,7 @@ from app.api.analysis import router as analysis_router
 from app.api.timeline import router as timeline_router
 from app.api.dashboard import router as dashboard_router
 from app.api.auth import router as auth_router
+from app.api.audit_log import router as audit_router
 
 app = FastAPI(
     title="RootCause AI"
@@ -52,3 +53,5 @@ app.include_router(
     prefix="/timeline",
     tags=["Timeline"],
 )
+
+app.include_router(audit_router)

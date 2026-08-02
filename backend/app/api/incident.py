@@ -2,22 +2,25 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.incident_query import IncidentQuery
-from app.services.incident_service import IncidentService
-from app.core.permissions import require_roles
-from app.models.user import User
-from app.schemas.incident_update import IncidentUpdate
+
 from app.db.session import get_db
+from app.models.user import User
+from app.core.permissions import require_roles
+
+from app.services.incident_service import IncidentService
+
+from app.schemas.incident import (
+    IncidentCreate,
+    IncidentResponse,
+)
+from app.schemas.incident_query import IncidentQuery
+from app.schemas.incident_update import IncidentUpdate
+
 from app.enums.incident import (
     Status,
     Severity,
     Environment,
 )
-from app.schemas.incident import (
-    IncidentCreate,
-    IncidentResponse,
-)
-
 
 router = APIRouter()
 
@@ -34,7 +37,11 @@ async def create_incident(
     ),
 ):
     service = IncidentService(db)
-    return await service.create_incident(incident)
+
+    return await service.create_incident(
+        incident,
+        current_user,
+    )
 
 
 @router.get(
@@ -54,7 +61,11 @@ async def get_incident(
     ),
 ):
     service = IncidentService(db)
-    return await service.get_incident(incident_id)
+
+    return await service.get_incident(
+        incident_id
+    )
+
 
 @router.patch(
     "/incidents/{incident_id}",
@@ -65,16 +76,21 @@ async def update_incident(
     data: IncidentUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(
-        require_roles("ADMIN", "ENGINEER", "SRE")
+        require_roles(
+            "ADMIN",
+            "ENGINEER",
+            "SRE",
+        )
     ),
 ):
-
     service = IncidentService(db)
 
     return await service.update_incident(
         incident_id,
         data,
+        current_user,
     )
+
 
 @router.get(
     "/incidents",
@@ -112,7 +128,10 @@ async def get_all_incidents(
 
     service = IncidentService(db)
 
-    return await service.get_all_incidents(query)
+    return await service.get_all_incidents(
+        query
+    )
+
 
 @router.delete(
     "/incidents/{incident_id}",
@@ -121,12 +140,17 @@ async def delete_incident(
     incident_id: UUID,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(
-        require_roles("ADMIN")
+        require_roles(
+            "ADMIN",
+            "ENGINEER",
+            "SRE",
+        )
     ),
 ):
 
     service = IncidentService(db)
 
     return await service.delete_incident(
-        incident_id
+        incident_id,
+        current_user,
     )

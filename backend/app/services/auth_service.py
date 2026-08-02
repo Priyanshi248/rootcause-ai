@@ -53,7 +53,9 @@ class AuthService:
         db_user = await self.user_repo.get_by_email(
             user.email
         )
+        print("User found:", db_user is not None)
 
+        print("Stored hash:", db_user.hashed_password if db_user else None)
         if (
             not db_user
             or not verify_password(
