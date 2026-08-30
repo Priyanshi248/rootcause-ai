@@ -1,307 +1,396 @@
 # RootCause AI
 
-An AI-powered Incident Management Platform that combines Retrieval-Augmented Generation (RAG) with Large Language Models to automate root cause analysis, incident investigation, and remediation suggestions for engineering teams.
+**RootCause AI** is an AI-powered incident intelligence platform designed to help engineering and DevOps teams investigate production incidents, identify potential root causes, retrieve similar historical incidents, and generate actionable remediation suggestions.
 
-RootCause AI enables developers and DevOps teams to upload production incidents, analyze system logs using AI, retrieve similar historical incidents through vector search, and generate actionable debugging insights—all from a single platform.
+The platform combines **Large Language Models (LLMs), Retrieval-Augmented Generation (RAG), vector search, incident management, operational logs, and AI-assisted investigation** into a single application.
+
+---
+
+## Live Demo
+
+| Service                 | Link                                           |
+| ----------------------- | ---------------------------------------------- |
+| **Live Application** | https://rootcause-ai-sand.vercel.app/          |
+| **Backend API**      | https://rootcause-ai-backend.onrender.com/     |
+| **Swagger API Docs** | https://rootcause-ai-backend.onrender.com/docs |
 
 ---
 
 ## Features
 
-- AI-powered root cause analysis using LLMs
-- Retrieval-Augmented Generation (RAG) for historical incident lookup
-- Incident lifecycle management
-- AI-generated summaries and suggested fixes
-- Semantic search over previous incidents
-- JWT Authentication
-- Incident timeline tracking
-- Dockerized backend
-- RESTful API built with FastAPI
-- PostgreSQL database with Alembic migrations
-
----
-
-## Tech Stack
-
-### Backend
-
-- Python
-- FastAPI
-- SQLAlchemy
-- Alembic
-
-### Database
-
-- PostgreSQL
-
-### AI
-
-- OpenRouter API
-- LLMs (Gemini / Nemotron / OpenAI compatible)
-- ChromaDB
-- Retrieval-Augmented Generation (RAG)
-
-### DevOps
-
-- Docker
-- Docker Compose
-
 ### Authentication
 
-- JWT
+* User registration and login
+* JWT-based authentication
+* Secure password hashing using bcrypt
 
----
+### Incident Management
 
-# System Architecture
+* Create, view, and update incidents
+* Track incident severity and status
+* Store incident descriptions and timestamps
+* Manage the complete incident lifecycle
 
-```
-                        User
-                         │
-                         ▼
-                  FastAPI Backend
-                         │
-        ┌────────────────┼────────────────┐
-        ▼                ▼                ▼
- Authentication    Incident APIs     AI Analysis
-        │                │                │
-        ▼                ▼                ▼
- PostgreSQL        ChromaDB        OpenRouter LLM
-        │                │                │
-        └───────────────RAG───────────────┘
-                         │
-                         ▼
-               Root Cause Analysis
-```
+### AI Incident Analysis
 
----
+AI-powered analysis generates structured insights such as:
 
-# Features
+* Executive summary
+* Possible root cause
+* Suggested fixes
+* Follow-up actions
+* Relevant historical incidents
 
-## Authentication
+### Retrieval-Augmented Generation
 
-- User registration
-- Login
-- JWT authentication
-- Protected APIs
+RootCause AI uses **RAG** to retrieve relevant historical incidents before generating AI responses.
 
----
+This allows the system to use previously resolved incidents as contextual knowledge when investigating new incidents.
 
-## Incident Management
+### AI Assistant
 
-Users can
+The integrated AI Assistant allows users to ask questions about:
 
-- Create incidents
-- View incidents
-- Update incidents
-- Delete incidents
-- Track incident history
+* Production incidents
+* Operational issues
+* Historical incidents
+* Possible causes
+* Recommended remediation steps
 
-Each incident stores
+### Dashboard
 
-- Title
-- Description
-- Severity
-- Status
-- Timestamp
+The dashboard provides an overview of the operational state of the system, including:
 
----
+* Total incidents
+* Incident severity
+* Incident status
+* Incident activity
 
-## AI Incident Analysis
+### Operational Logs
 
-The AI engine automatically analyzes uploaded incident descriptions and generates
+RootCause AI supports multiple log categories:
 
-- Executive Summary
-- Root Cause
-- Suggested Fix
-- Follow-up Actions
+* Application
+* Nginx
+* Docker
+* Kubernetes
+* System
+* Custom
 
-Example
+Logs can be used during incident investigation and AI-assisted analysis.
 
-```
-Summary:
-Database timeout caused API failures.
+### Incident Timeline
 
-Root Cause:
-Missing database index on frequently queried column.
+The incident timeline provides a chronological view of an incident from detection to resolution.
 
-Suggested Fix:
-Create index and optimize slow query.
-
-Follow-up:
-Monitor query latency after deployment.
+```text
+Incident Detected
+       ↓
+Investigation Started
+       ↓
+Logs Reviewed
+       ↓
+AI Analysis
+       ↓
+Remediation
+       ↓
+Incident Resolved
 ```
 
+### Audit Logs
+
+Important system activities are recorded through audit logs.
+
+This improves **traceability, accountability, and visibility** during incident investigation and management.
+
 ---
 
-## Retrieval-Augmented Generation (RAG)
+## RAG Workflow
 
-Before generating a response, RootCause AI searches previous incidents stored in a vector database.
+The RAG pipeline retrieves relevant historical information using semantic similarity and provides it as context to the language model.
 
-The retrieved context is combined with the current incident before sending it to the LLM.
-
-Benefits
-
-- Better contextual responses
-- Reduced hallucinations
-- Consistent troubleshooting
-- Knowledge reuse
+```text
+User Question / Incident
+          ↓
+     Generate Embedding
+          ↓
+      Vector Search
+          ↓
+Historical Incidents
+          ↓
+    Relevant Context
+          ↓
+         LLM
+          ↓
+   AI Generated Response
+```
 
 ---
 
 ## Semantic Search
 
-Historical incidents are embedded into ChromaDB.
+Historical incident information is converted into vector embeddings and stored in **ChromaDB**.
 
-Similar incidents can be retrieved using semantic similarity instead of keyword matching.
+When a new incident or question is analyzed, RootCause AI searches for semantically similar historical incidents rather than relying only on exact keyword matches.
 
----
+For example:
 
-## Incident Timeline
+```text
+New Incident:
+"API requests are timing out"
 
-Every AI analysis is stored separately, allowing teams to
+Historical Incident:
+"Backend requests experienced high latency"
 
-- Track incident evolution
-- Compare analyses
-- Review previous recommendations
+                ↓
 
----
+       Semantic Similarity Search
 
-## Database
+                ↓
 
-Main entities include
-
-### Users
-
-- id
-- username
-- email
-- password
-
-### Incidents
-
-- id
-- title
-- description
-- severity
-- status
-- created_at
-
-### AI Analysis
-
-- id
-- incident_id
-- summary
-- root_cause
-- suggested_fix
-- follow_up_actions
-
----
-
-# Project Structure
-
+   Relevant Historical Incident
 ```
-RootCause-AI/
-│
-├── app/
-│   ├── api/
-│   ├── agents/
-│   ├── models/
-│   ├── repositories/
-│   ├── services/
-│   ├── schemas/
-│   ├── db/
-│   └── core/
-│
-├── chroma_db/
-├── alembic/
-├── docker-compose.yml
-├── Dockerfile
-├── requirements.txt
-└── README.md
+
+This allows the system to retrieve useful incidents even when their wording is different.
+
+---
+
+## System Architecture
+
+```text
+                         User
+                           │
+                           ↓
+                   Vercel Frontend
+                           │
+                           ↓
+                    FastAPI Backend
+                           │
+             ┌─────────────┼─────────────┐
+             ↓             ↓             ↓
+       PostgreSQL       ChromaDB      OpenRouter
+          Neon           Vectors          LLM
+             │             │             │
+             └─────────────┼─────────────┘
+                           ↓
+                     RAG Pipeline
+                           ↓
+                  AI Incident Analysis
+                           ↓
+                Root Cause + Remediation
 ```
 
 ---
 
-# Installation
+## Tech Stack
 
-Clone the repository
+### Frontend
 
-```bash
-git clone https://github.com/Priyanshi248/rootcause-ai.git
+* HTML
+* CSS
+* JavaScript
+* Vercel
+
+### Backend
+
+* Python
+* FastAPI
+* SQLAlchemy
+* Alembic
+* JWT Authentication
+* bcrypt
+
+### Database
+
+* PostgreSQL
+* Neon PostgreSQL
+
+### AI & RAG
+
+* OpenRouter
+* Large Language Models
+* Hugging Face Embeddings
+* ChromaDB
+* Semantic Search
+* Retrieval-Augmented Generation
+
+### DevOps
+
+* Docker
+* Docker Compose
+* GitHub Actions
+* Render
+* Vercel
+
+---
+
+## CI/CD
+
+RootCause AI uses **GitHub Actions** to automatically execute backend tests when changes are pushed to the repository.
+
+The automated tests cover areas such as:
+
+* Database connectivity
+* Model imports
+* ChromaDB retrieval
+* AI response parsing
+
+### CI/CD Workflow
+
+```text
+Git Push
+   ↓
+GitHub Actions
+   ↓
+Automated Tests
+   ↓
+Deployment
 ```
 
-Move into the project
+---
 
-```bash
-cd rootcause-ai
-```
+## Docker
 
-Create environment variables
+The backend is containerized using Docker to provide a consistent development and deployment environment.
 
-```env
-DATABASE_URL=
-
-OPENROUTER_API_KEY=
-
-JWT_SECRET_KEY=
-```
-
-Run with Docker
+Start the application using:
 
 ```bash
 docker compose up --build
 ```
 
-Run locally
+---
+
+## Local Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Priyanshi248/rootcause-ai.git
+cd rootcause-ai
+```
+
+### 2. Move to the Backend
+
+```bash
+cd backend
+```
+
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
+```
 
+### 4. Configure Environment Variables
+
+Create a `.env` file containing the required configuration for:
+
+* PostgreSQL database
+* JWT authentication
+* OpenRouter / AI API
+* ChromaDB
+* Other application settings
+
+Example:
+
+```env
+DATABASE_URL=your_database_url
+SECRET_KEY=your_secret_key
+OPENROUTER_API_KEY=your_api_key
+```
+
+> Never commit your `.env` file or API keys to GitHub.
+
+### 5. Run the Backend
+
+```bash
 uvicorn app.main:app --reload
 ```
 
-Swagger UI
+The API will be available at:
 
+```text
+http://localhost:8000
 ```
+
+### 6. Open Swagger Documentation
+
+```text
 http://localhost:8000/docs
 ```
 
----
+### 7. Run Tests
 
-# Workflow
-
-1. User creates an incident.
-2. Incident is stored in PostgreSQL.
-3. Logs are embedded into ChromaDB.
-4. Similar historical incidents are retrieved.
-5. Context is sent to the LLM.
-6. AI generates:
-
-- Summary
-- Root Cause
-- Suggested Fix
-- Follow-up Actions
-
-7. Analysis is saved.
-8. User can review previous analyses.
+```bash
+pytest -q
+```
 
 ---
 
-# Future Enhancements
+## Deployment
 
-- Frontend dashboard using React
-- Grafana monitoring
-- Kubernetes deployment
-- CI/CD with GitHub Actions
-- Multi-agent architecture
-- Elasticsearch integration
-- Slack & Microsoft Teams notifications
-- Prometheus metrics
-- Redis caching
-- RBAC (Role-Based Access Control)
+RootCause AI uses separate services for production deployment.
+
+```text
+Frontend  → Vercel
+Backend   → Render
+Database  → Neon PostgreSQL
+CI/CD     → GitHub Actions
+```
+
+The frontend communicates with the FastAPI backend through REST APIs.
 
 ---
 
-# Author
+## Project Structure
 
-**Priyanshi Saxena**
+```text
+rootcause-ai/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── main.py
+│   │
+│   ├── tests/
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── index.html
+│   ├── css/
+│   └── js/
+│
+├── .github/
+│   └── workflows/
+│
+├── docker-compose.yml
+├── README.md
+└── .gitignore
+```
+
+---
+
+## Why RootCause AI?
+
+Traditional incident investigation often requires engineers to manually search through logs, previous incidents, documentation, and monitoring systems.
+
+RootCause AI brings these capabilities together and uses AI + historical incident retrieval to help engineers move from:
+
+```text
+Incident
+   ↓
+Investigation
+   ↓
+Historical Context
+   ↓
+Possible Root Cause
+   ↓
+Remediation
+```
+
+The goal is to **reduce investigation time, improve incident response, and preserve organizational knowledge from previous incidents.**
