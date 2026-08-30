@@ -36,19 +36,13 @@ async def get_current_user(
     user_id = payload.get("sub")
 
     if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
+        raise UnauthorizedException()
 
     repo = UserRepository(db)
 
     user = await repo.get_by_id(UUID(user_id))
 
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-        )
+        raise UserNotFoundException()
 
     return user

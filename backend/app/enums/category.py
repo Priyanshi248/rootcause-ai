@@ -1,0 +1,22 @@
+from enum import Enum
+
+
+class IncidentCategory(str, Enum):
+
+    DATABASE = "DATABASE"
+
+    NETWORK = "NETWORK"
+
+    APPLICATION = "APPLICATION"
+
+    AUTHENTICATION = "AUTHENTICATION"
+
+    CONFIGURATION = "CONFIGURATION"
+
+    CACHE = "CACHE"
+
+    INFRASTRUCTURE = "INFRASTRUCTURE"
+
+    SECURITY = "SECURITY"
+
+    UNKNOWN = "UNKNOWN"

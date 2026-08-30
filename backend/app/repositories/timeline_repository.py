@@ -4,26 +4,24 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.timeline import TimelineEvent
+from app.repositories.base_repository import BaseRepository
 
 
-class TimelineRepository:
+class TimelineRepository(BaseRepository[TimelineEvent]):
 
-    def __init__(self, db: AsyncSession):
-        self.db = db
-
-    async def create(
+    def __init__(
         self,
-        event: TimelineEvent,
+        db: AsyncSession,
     ):
-        self.db.add(event)
-        await self.db.commit()
-        await self.db.refresh(event)
-        return event
+        super().__init__(
+            db,
+            TimelineEvent,
+        )
 
     async def get_by_incident(
         self,
         incident_id: UUID,
-    ):
+    ) -> list[TimelineEvent]:
 
         result = await self.db.execute(
             select(TimelineEvent)

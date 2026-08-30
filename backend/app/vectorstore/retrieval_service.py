@@ -4,6 +4,10 @@ from app.vectorstore.embedding_service import create_embedding
 
 class RetrievalService:
 
+    # ==================================================
+    # ADD INCIDENT
+    # ==================================================
+
     def add_incident(
         self,
         incident_id,
@@ -23,9 +27,7 @@ Description:
 {description}
 """
 
-        embedding = create_embedding(
-            document
-        )
+        embedding = create_embedding(document)
 
         collection.add(
             ids=[str(incident_id)],
@@ -35,9 +37,14 @@ Description:
                 {
                     "service": service_name,
                     "title": title,
+                    "has_analysis": False,
                 }
             ],
         )
+
+    # ==================================================
+    # UPDATE INCIDENT WITH AI KNOWLEDGE
+    # ==================================================
 
     def update_incident_knowledge(
         self,
@@ -52,27 +59,27 @@ Description:
     ):
 
         document = f"""
-    Title:
-    {title}
+Title:
+{title}
 
-    Service:
-    {service_name}
+Service:
+{service_name}
 
-    Description:
-    {description}
+Description:
+{description}
 
-    Summary:
-    {summary}
+Summary:
+{summary}
 
-    Root Cause:
-    {root_cause}
+Root Cause:
+{root_cause}
 
-    Suggested Fix:
-    {suggested_fix}
+Suggested Fix:
+{suggested_fix}
 
-    Follow Up:
-    {follow_up_actions}
-    """
+Follow Up:
+{follow_up_actions}
+"""
 
         embedding = create_embedding(document)
 
@@ -89,21 +96,42 @@ Description:
             ],
         )
 
+    # ==================================================
+    # SEARCH SIMILAR INCIDENTS
+    # ==================================================
+
     def search(
         self,
         query,
         n_results=5,
     ):
 
-        embedding = create_embedding(
-            query
-        )
+        embedding = create_embedding(query)
+
+        # Check whether the vector store contains anything
+        count = collection.count()
+
+        if count == 0:
+            return []
+
+        # Never request more results than actually exist
+        n_results = min(n_results, count)
 
         results = collection.query(
             query_embeddings=[
                 embedding
             ],
             n_results=n_results,
+            include=[
+                "documents",
+                "metadatas",
+                "distances",
+            ],
         )
 
-        return results["documents"][0]
+        documents = results.get(
+            "documents",
+            [[]],
+        )[0]
+
+        return documents

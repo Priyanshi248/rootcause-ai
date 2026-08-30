@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import ForeignKey, Text, String
+from sqlalchemy import ForeignKey, Text, String, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -26,12 +26,77 @@ class Analysis(TimestampMixin, Base):
         nullable=False,
     )
 
+    executive_summary: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
     summary: Mapped[str] = mapped_column(
         Text,
         nullable=False,
     )
 
     root_cause: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    confidence: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+
+    confidence_reason: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    category: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+    )
+
+    subcategory: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )
+
+    affected_component: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )
+
+    priority: Mapped[str] = mapped_column(
+        String(10),
+        nullable=False,
+    )
+
+    severity_prediction: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+
+    business_impact: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    immediate_actions: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    runbook: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    risk_if_ignored: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    prevention: Mapped[str] = mapped_column(
         Text,
         nullable=False,
     )
@@ -47,7 +112,7 @@ class Analysis(TimestampMixin, Base):
     )
 
     model_used: Mapped[str] = mapped_column(
-        String(50),
+        String(100),
         nullable=False,
     )
 

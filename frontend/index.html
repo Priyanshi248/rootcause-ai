@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>RootCause AI</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- ==================================================
+         LOGIN
+    ================================================== -->
+
+    <section
+        id="login-section"
+        class="card"
+    >
+
+        <div class="login-container">
+
+            <h1>
+                RootCause AI
+            </h1>
+
+            <p class="muted">
+                AI-Powered Incident Root Cause Analysis
+            </p>
+
+
+            <h2>
+                Login
+            </h2>
+
+
+            <div class="form-group">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    id="login-email"
+                    type="email"
+                    placeholder="debug@example.com"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    id="login-password"
+                    type="password"
+                    placeholder="Enter your password"
+                >
+
+            </div>
+
+
+            <button
+                onclick="login()"
+                class="primary-button"
+            >
+                Login
+            </button>
+
+
+            <div
+                id="login-message"
+                class="message"
+            ></div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         APPLICATION
+    ================================================== -->
+
+    <div
+        id="app-section"
+        class="hidden"
+    >
+
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+
+                <h1>
+                    RootCause AI
+                </h1>
+
+                <p>
+                    AI-Powered Incident Root Cause Analysis
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <span class="status">
+                    ● Backend Connected
+                </span>
+
+                <button
+                    onclick="logout()"
+                    class="secondary-button"
+                    style="margin-left: 10px;"
+                >
+                    Logout
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- ==================================================
+             CREATE INCIDENT
+        ================================================== -->
+
+        <section class="card">
+
+            <h2>
+                Create Incident
+            </h2>
+
+
+            <div class="form-grid">
+
+
+                <div class="form-group">
+
+                    <label>
+                        Title
+                    </label>
+
+                    <input
+                        id="title"
+                        type="text"
+                        placeholder="Enter incident title"
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label>
+                        Service
+                    </label>
+
+                    <input
+                        id="service"
+                        type="text"
+                        placeholder="Enter affected service"
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label>
+                        Environment
+                    </label>
+
+                    <select id="environment">
+
+                        <option value="PRODUCTION">
+                            PRODUCTION
+                        </option>
+
+                        <option value="STAGING">
+                            STAGING
+                        </option>
+
+                        <option value="DEVELOPMENT">
+                            DEVELOPMENT
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label>
+                        Severity
+                    </label>
+
+                    <select id="severity">
+
+                        <option value="CRITICAL">
+                            CRITICAL
+                        </option>
+
+                        <option
+                            value="HIGH"
+                            selected
+                        >
+                            HIGH
+                        </option>
+
+                        <option value="MEDIUM">
+                            MEDIUM
+                        </option>
+
+                        <option value="LOW">
+                            LOW
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    placeholder="Describe the incident"
+                ></textarea>
+
+            </div>
+
+
+
+            <button
+                onclick="createIncident()"
+                class="primary-button"
+            >
+                Create Incident
+            </button>
+
+
+            <div
+                id="incident-message"
+                class="message"
+            ></div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             CURRENT INCIDENT
+        ================================================== -->
+
+        <section
+            id="incident-section"
+            class="card hidden"
+        >
+
+            <h2>
+                Current Incident
+            </h2>
+
+
+            <div class="incident-info">
+
+
+                <div>
+
+                    <span>
+                        Incident ID
+                    </span>
+
+                    <strong id="incident-id"></strong>
+
+                </div>
+
+
+
+                <div>
+
+                    <span>
+                        Title
+                    </span>
+
+                    <strong id="incident-title"></strong>
+
+                </div>
+
+
+
+                <div>
+
+                    <span>
+                        Service
+                    </span>
+
+                    <strong id="incident-service"></strong>
+
+                </div>
+
+
+
+                <div>
+
+                    <span>
+                        Severity
+                    </span>
+
+                    <strong id="incident-severity"></strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             LOG UPLOAD
+        ================================================== -->
+
+        <section
+            id="log-section"
+            class="card hidden"
+        >
+
+            <h2>
+                Upload Incident Logs
+            </h2>
+
+
+            <p class="muted">
+                Upload the logs associated with this incident.
+            </p>
+
+
+            <input
+                id="log-file"
+                type="file"
+            >
+
+
+            <button
+                onclick="uploadLog()"
+                class="secondary-button"
+            >
+                Upload Log
+            </button>
+
+
+            <div
+                id="log-message"
+                class="message"
+            ></div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             AI ANALYSIS
+        ================================================== -->
+
+        <section
+            id="analysis-section"
+            class="card hidden"
+        >
+
+
+            <div class="analysis-header">
+
+                <div>
+
+                    <h2>
+                        AI Root Cause Analysis
+                    </h2>
+
+                    <p class="muted">
+                        Generated using OpenRouter + Nemotron
+                    </p>
+
+                </div>
+
+
+                <button
+                    onclick="analyzeIncident()"
+                    class="primary-button"
+                >
+                    Analyze Incident
+                </button>
+
+            </div>
+
+
+
+            <div
+                id="analysis-loading"
+                class="loading hidden"
+            >
+                Analyzing incident...
+            </div>
+
+
+
+            <div
+                id="analysis-result"
+                class="hidden"
+            >
+
+
+                <div class="metrics">
+
+
+                    <div class="metric">
+
+                        <span>
+                            Confidence
+                        </span>
+
+                        <strong id="confidence"></strong>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <span>
+                            Priority
+                        </span>
+
+                        <strong id="priority"></strong>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <span>
+                            Category
+                        </span>
+
+                        <strong id="category"></strong>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <span>
+                            Similar Incidents
+                        </span>
+
+                        <strong id="retrieved-count"></strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Executive Summary
+                    </h3>
+
+                    <p id="executive-summary"></p>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Root Cause
+                    </h3>
+
+                    <p id="root-cause"></p>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Business Impact
+                    </h3>
+
+                    <p id="business-impact"></p>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Immediate Actions
+                    </h3>
+
+                    <p id="immediate-actions"></p>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Suggested Fix
+                    </h3>
+
+                    <p id="suggested-fix"></p>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Prevention
+                    </h3>
+
+                    <p id="prevention"></p>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Follow-up Actions
+                    </h3>
+
+                    <p id="follow-up-actions"></p>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Operational Runbook
+                    </h3>
+
+                    <p id="runbook"></p>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Risk if Ignored
+                    </h3>
+
+                    <p id="risk-if-ignored"></p>
+
+                </div>
+
+
+
+                <div class="analysis-block">
+
+                    <h3>
+                        Confidence Reason
+                    </h3>
+
+                    <p id="confidence-reason"></p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             DASHBOARD
+        ================================================== -->
+
+        <section class="card">
+
+
+            <div class="analysis-header">
+
+                <div>
+
+                    <h2>
+                        Incident Dashboard
+                    </h2>
+
+                    <p class="muted">
+                        Current incident statistics
+                    </p>
+
+                </div>
+
+
+                <button
+                    onclick="loadDashboard()"
+                    class="secondary-button"
+                >
+                    Refresh
+                </button>
+
+            </div>
+
+
+
+            <div
+                id="dashboard"
+                class="metrics"
+            >
+
+
+                <div class="metric">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <strong id="total-incidents">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="metric">
+
+                    <span>
+                        Open
+                    </span>
+
+                    <strong id="open-incidents">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="metric">
+
+                    <span>
+                        Resolved
+                    </span>
+
+                    <strong id="resolved-incidents">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="metric">
+
+                    <span>
+                        Critical
+                    </span>
+
+                    <strong id="critical-incidents">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="metric">
+
+                    <span>
+                        High
+                    </span>
+
+                    <strong id="high-incidents">
+                        -
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <footer>
+
+            RootCause AI · Backend-first incident intelligence
+
+        </footer>
+
+
+    </div>
+
+
+    <script src="app.js"></script>
+
+</div>
+
+</body>
+
+</html>

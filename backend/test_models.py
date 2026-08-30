@@ -1,7 +1,18 @@
-from google import genai
-from app.core.config import settings
+from app.models import (
+    Incident,
+    Log,
+    Analysis,
+    TimelineEvent,
+    User,
+    AuditLog,
+)
 
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-for model in client.models.list():
-    print(model.name)
+def test_models_import():
+
+    assert Incident is not None
+    assert Log is not None
+    assert Analysis is not None
+    assert TimelineEvent is not None
+    assert User is not None
+    assert AuditLog is not None

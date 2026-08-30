@@ -1,22 +1,37 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
+from app.core.constants import (
+    INCIDENT_CREATED,   
+    STATUS_CHANGED,
+    SEVERITY_CHANGED,
+    ENGINEER_ASSIGNED,
+)
+from app.enums.incident import Status
 from app.models.incident import Incident
+from app.models.user import User
 from app.repositories.incident_repository import IncidentRepository
 from app.schemas.incident import IncidentCreate
 from app.schemas.incident_query import IncidentQuery
 from app.schemas.incident_update import IncidentUpdate
-from app.enums.incident import Status
+from app.services.audit_log_service import AuditLogService
 from app.services.timeline_service import TimelineService
 from app.vectorstore.retrieval_service import RetrievalService
-from app.services.audit_log_service import AuditLogService
-
+from app.enums.role import Role
 
 class IncidentService:
 
     def __init__(self, db: AsyncSession):
+
+        self.db = db
+
         self.repository = IncidentRepository(db)
+
+        self.timeline = TimelineService(db)
+
+        self.audit = AuditLogService(db)
+
+        self.retrieval = RetrievalService()
 
     async def _check_permission(
         self,
@@ -24,7 +39,10 @@ class IncidentService:
         current_user: User,
     ):
         # Admin and SRE can modify every incident
-        if current_user.role in ["ADMIN", "SRE"]:
+        if current_user.role in {
+            Role.ADMIN.value,
+            Role.SRE.value,
+        }:
             return
 
         # Engineers can modify only their own incidents
@@ -54,22 +72,16 @@ class IncidentService:
             incident,
         )
 
-        retrieval = RetrievalService()
-
-        retrieval.add_incident(
+        self.retrieval.add_incident(
             incident.id,
             incident.title,
             incident.description,
             incident.service_name,
         )
 
-        timeline = TimelineService(
-            self.repository.db
-        )
-
-        await timeline.create_event(
+        await self.timeline.create_event(
             incident.id,
-            "INCIDENT_CREATED",
+            INCIDENT_CREATED,
             f"Incident '{incident.title}' was created.",
         )
 
@@ -86,7 +98,7 @@ class IncidentService:
     async def get_all_incidents(
         self,
         query: IncidentQuery,
-    ):
+    ) -> list[Incident]:
         return await self.repository.get_all(
             query
         )
@@ -96,7 +108,7 @@ class IncidentService:
         incident_id,
         data: IncidentUpdate,
         current_user: User,
-    ):
+    ) -> Incident:
 
         incident = await self.repository.get_incident(
             incident_id
@@ -107,95 +119,137 @@ class IncidentService:
             current_user,
         )
 
-        audit = AuditLogService(
-            self.repository.db
+        await self._update_status(
+            incident,
+            data,
+            current_user,
         )
 
-        timeline = TimelineService(
-            self.repository.db
+        await self._update_severity(
+            incident,
+            data,
+            current_user,
         )
 
-    # ---------------- STATUS ----------------
-        if (
-            data.status is not None
-            and data.status != incident.status
-        ):
-
-            old_status = incident.status
-
-            incident.status = data.status
-
-            await timeline.create_event(
-                incident.id,
-                "STATUS_CHANGED",
-                f"Status changed from {old_status.value} to {incident.status.value}.",
-            )
-
-            await audit.log_action(
-                incident_id=incident.id,
-                performed_by=current_user.id,
-                action="STATUS_CHANGED",
-                old_value=old_status.value,
-                new_value=incident.status.value,
-            )
-
-    # ---------------- SEVERITY ----------------
-        if (
-            data.severity is not None
-            and data.severity != incident.severity
-        ):
-
-            old_severity = incident.severity
-
-            incident.severity = data.severity
-
-            await timeline.create_event(
-                incident.id,
-                "SEVERITY_CHANGED",
-                f"Severity changed from {old_severity.value} to {incident.severity.value}.",
-            )
-
-            await audit.log_action(
-                incident_id=incident.id,
-                performed_by=current_user.id,
-                action="SEVERITY_CHANGED",
-                old_value=old_severity.value,
-                new_value=incident.severity.value,
-            )
-
-    # ---------------- ASSIGNED ENGINEER ----------------
-        if (
-            data.assigned_engineer is not None
-            and data.assigned_engineer != incident.assigned_engineer
-        ):
-
-            old_engineer = incident.assigned_engineer
-
-            incident.assigned_engineer = data.assigned_engineer
-
-            await timeline.create_event(
-                incident.id,
-                "ENGINEER_ASSIGNED",
-                f"Assigned to {incident.assigned_engineer}.",
-            )
-
-            await audit.log_action(
-                incident_id=incident.id,
-                performed_by=current_user.id,
-                action="ENGINEER_ASSIGNED",
-                old_value=old_engineer,
-                new_value=incident.assigned_engineer,
-            )
+        await self._update_assignment(
+            incident,
+            data,
+            current_user,
+        )
 
         return await self.repository.update(
             incident
+        )
+
+    # ---------------- STATUS ----------------
+    async def _record_change(
+        self,
+        incident: Incident,
+        current_user: User,
+        action: str,
+        old_value,
+        new_value,
+        message: str,
+    ):
+
+        await self.timeline.create_event(
+            incident.id,
+            action,
+            message,
+        )
+
+        await self.audit.log_action(
+            incident_id=incident.id,
+            performed_by=current_user.id,
+            action=action,
+            old_value=str(old_value) if old_value is not None else None,
+            new_value=str(new_value) if new_value is not None else None,
+        )
+
+    async def _update_status(
+        self,
+        incident: Incident,
+        data: IncidentUpdate,
+        current_user: User,
+    ):
+
+        if (
+            data.status is None
+            or data.status == incident.status
+        ):
+            return
+
+        old_status = incident.status
+
+        incident.status = data.status
+
+        await self._record_change(
+            incident,
+            current_user,
+            STATUS_CHANGED,
+            old_status.value,
+            incident.status.value,
+            f"Status changed from {old_status.value} to {incident.status.value}.",
+        )
+    # ---------------- SEVERITY ----------------
+    async def _update_severity(
+        self,
+        incident: Incident,
+        data: IncidentUpdate,
+        current_user: User,
+    ):
+
+        if (
+            data.severity is None
+            or data.severity == incident.severity
+        ):
+            return
+
+        old_severity = incident.severity
+
+        incident.severity = data.severity
+
+        await self._record_change(
+            incident,
+            current_user,
+            SEVERITY_CHANGED,
+            old_severity.value,
+            incident.severity.value,
+            f"Severity changed from {old_severity.value} to {incident.severity.value}.",
+        )
+
+    # ---------------- ASSIGNED ENGINEER ----------------
+    async def _update_assignment(
+        self,
+        incident: Incident,
+        data: IncidentUpdate,
+        current_user: User,
+    ):
+
+        if (
+            data.assigned_engineer is None
+            or data.assigned_engineer == incident.assigned_engineer
+        ):
+            return
+
+        old_engineer = incident.assigned_engineer
+
+        incident.assigned_engineer = data.assigned_engineer
+
+        await self._record_change(
+            incident,
+            current_user,
+            ENGINEER_ASSIGNED,
+            old_engineer,
+            incident.assigned_engineer,
+            f"Assigned to {incident.assigned_engineer}.",
         )
 
     async def delete_incident(
         self,
         incident_id,
         current_user: User,
-    ):
+    )-> dict:
 
         incident = await self.repository.get_incident(
             incident_id

@@ -4,30 +4,24 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.audit_log import AuditLog
+from app.repositories.base_repository import BaseRepository
 
 
-class AuditLogRepository:
+class AuditLogRepository(BaseRepository[AuditLog]):
 
-    def __init__(self, db: AsyncSession):
-        self.db = db
-
-    async def create(
+    def __init__(
         self,
-        audit_log: AuditLog,
+        db: AsyncSession,
     ):
-
-        self.db.add(audit_log)
-
-        await self.db.commit()
-
-        await self.db.refresh(audit_log)
-
-        return audit_log
+        super().__init__(
+            db,
+            AuditLog,
+        )
 
     async def get_by_incident(
         self,
         incident_id: UUID,
-    ):
+    ) -> list[AuditLog]:
 
         result = await self.db.execute(
             select(AuditLog)

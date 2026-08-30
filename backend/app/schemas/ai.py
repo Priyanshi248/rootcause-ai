@@ -15,7 +15,11 @@ class AIRequest(BaseModel):
 
     question: str | None = None
 
+    incident_id: str | None = None
+
 
 class AIResponse(BaseModel):
 
     response: str
+
+    sources: list[str] = []

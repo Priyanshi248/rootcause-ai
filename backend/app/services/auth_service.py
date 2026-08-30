@@ -1,81 +1,74 @@
 from fastapi import HTTPException, status
 
-from app.models.user import User
-from app.repositories.user_repository import UserRepository
-from app.schemas.user import (
-    UserCreate,
-    UserLogin,
-)
 from app.core.security import (
+    create_access_token,
     hash_password,
     verify_password,
-    create_access_token,
 )
+from app.models.user import User
+from app.repositories.user_repository import UserRepository
+from app.schemas.user import UserCreate, UserLogin
 
 
 class AuthService:
 
     def __init__(self, db):
-
-        self.user_repo = UserRepository(db)
+        self.user_repository = UserRepository(db)
 
     async def register(
         self,
         user: UserCreate,
-    ):
+    ) -> User:
 
-        existing = await self.user_repo.get_by_email(
+        existing_user = await self.user_repository.get_by_email(
             user.email
         )
 
-        if existing:
+        if existing_user:
             raise HTTPException(
-                status_code=400,
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered",
             )
 
-        db_user = User(
+        new_user = User(
             full_name=user.full_name,
             email=user.email,
             hashed_password=hash_password(user.password),
             role="ENGINEER",
         )
 
-        return await self.user_repo.create(
-            db_user
+        return await self.user_repository.create(
+            new_user
         )
 
     async def login(
         self,
         user: UserLogin,
-    ):
+    ) -> dict:
 
-        db_user = await self.user_repo.get_by_email(
+        db_user = await self.user_repository.get_by_email(
             user.email
         )
-        print("User found:", db_user is not None)
 
-        print("Stored hash:", db_user.hashed_password if db_user else None)
         if (
-            not db_user
+            db_user is None
             or not verify_password(
                 user.password,
                 db_user.hashed_password,
             )
         ):
-
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password",
+            from app.exceptions.auth import (
+                InvalidCredentialsException,
             )
+            raise InvalidCredentialsException()
 
-        token = create_access_token(
+        access_token = create_access_token(
             {
-                "sub": str(db_user.id)
+                "sub": str(db_user.id),
             }
         )
 
         return {
-            "access_token": token,
+            "access_token": access_token,
             "token_type": "bearer",
         }

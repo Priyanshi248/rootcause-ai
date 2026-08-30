@@ -1,59 +1,43 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
-from sqlalchemy import select, or_
+
+from sqlalchemy import or_, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.incident import Incident
-from fastapi import HTTPException
+from app.repositories.base_repository import BaseRepository
 from app.schemas.incident_query import IncidentQuery
+from app.exceptions.incident import IncidentNotFoundException
 
 
-class IncidentRepository:
+class IncidentRepository(BaseRepository[Incident]):
 
-    def __init__(self, db: AsyncSession):
-        self.db = db
-
-    async def create(
+    def __init__(
         self,
-        incident: Incident,
-    ) -> Incident:
-
-        self.db.add(incident)
-
-        await self.db.commit()
-
-        await self.db.refresh(incident)
-
-        return incident
-    
-    async def get_by_id(
-        self,
-        incident_id: UUID,
-    ) -> Incident | None:
-
-        result = await self.db.execute(
-            select(Incident).where(Incident.id == incident_id)
+        db: AsyncSession,
+    ):
+        super().__init__(
+            db,
+            Incident,
         )
 
-        return result.scalar_one_or_none()
-    
     async def get_incident(
         self,
-    incident_id: UUID,
+        incident_id: UUID,
     ) -> Incident:
-        incident = await self.get_by_id(incident_id)
-        
+
+        incident = await self.get_by_id(
+            incident_id
+        )
+
         if incident is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Incident not found",
-            )
+            raise IncidentNotFoundException()
 
         return incident
-
 
     async def get_all(
         self,
         query: IncidentQuery,
-    ):
+    ) -> list[Incident]:
 
         stmt = select(Incident)
 
@@ -89,13 +73,13 @@ class IncidentRepository:
 
         stmt = (
             stmt
+            .order_by(
+                Incident.created_at.desc()
+            )
             .offset(
                 (query.page - 1) * query.limit
             )
             .limit(query.limit)
-            .order_by(
-                Incident.created_at.desc()
-            )
         )
 
         result = await self.db.execute(
@@ -103,24 +87,3 @@ class IncidentRepository:
         )
 
         return result.scalars().all()
-
-
-    async def update(
-        self,
-        incident: Incident,
-    ) -> Incident:
-
-        await self.db.commit()
-
-        await self.db.refresh(incident)
-
-        return incident
-
-    async def delete(
-        self,
-        incident: Incident,
-    ):
-
-        await self.db.delete(incident)
-
-        await self.db.commit()
