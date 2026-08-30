@@ -11,7 +11,7 @@ The platform combines **Large Language Models (LLMs), Retrieval-Augmented Genera
 | Service                 | Link                                           |
 | ----------------------- | ---------------------------------------------- |
 | **Live Application** | https://rootcause-ai-sand.vercel.app/          |
-| **Backend API**      | https://rootcause-ai-backend.onrender.com/     |
+| **Backend API**      | https://rootcause-ai-backend.onrender.com/docs |
 | **Swagger API Docs** | https://rootcause-ai-backend.onrender.com/docs |
 
 ---
